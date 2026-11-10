@@ -1,0 +1,243 @@
+CREATE DATABASE peminjaman_alat_laboratorium_new;
+USE  peminjaman_alat_laboratorium_new;
+
+CREATE TABLE mahasiswa (
+mahasiswa_id CHAR(6) PRIMARY KEY,
+nama_mahasiswa VARCHAR(100) NOT NULL,
+email VARCHAR(100) NOT NULL,
+status_aktif BOOLEAN 
+
+);
+
+SELECT * FROM mahasiswa;
+
+CREATE TABLE petugas (
+petugas_id CHAR(6) PRIMARY KEY,
+nama_petugas VARCHAR(100) NOT NULL,
+email_petugas VARCHAR(100) NOT NULL
+);
+
+SELECT * FROM petugas;
+
+CREATE TABLE ruang_laboratorium (
+ruang_id CHAR(6) PRIMARY KEY,
+nama_ruang VARCHAR(100) NOT NULL,
+gedung VARCHAR(100) NOT NULL,
+lantai INT NOT NULL 
+);
+
+ALTER TABLE ruang_laboratorium MODIFY gedung VARCHAR(50);
+
+SELECT * FROM ruang_laboratorium;
+
+
+CREATE TABLE pemasok (
+pemasok_id CHAR(6) PRIMARY KEY,
+nama_pemasok VARCHAR(100) NOT NULL,
+telepon VARCHAR(20) NOT NULL,
+email_pemasok VARCHAR(100) NULL
+);
+
+SELECT * FROM pemasok;
+
+CREATE TABLE kategori_alat (
+kategori_id CHAR(6) PRIMARY KEY,
+nama_kategori VARCHAR(50) NOT NULL
+);
+
+SELECT * FROM kategori_alat;
+
+CREATE TABLE peminjaman (
+peminjaman_id CHAR(6) PRIMARY KEY,
+tanggal_pinjam DATE NOT NULL,
+batas_kembali DATE NOT NULL,
+tanggal_pengembalian DATE NULL,
+mahasiswa_mahasiswa_id CHAR(6) NOT NULL,
+petugas_petugas_id  CHAR(6) NOT NULL,
+
+CONSTRAINT fk_peminjaman_petugas FOREIGN KEY (petugas_petugas_id)
+REFERENCES petugas(petugas_id)
+ON DELETE RESTRICT
+ON UPDATE CASCADE,
+
+
+CONSTRAINT fk_peminjaman_mahasiswa FOREIGN KEY (mahasiswa_mahasiswa_id)
+REFERENCES mahasiswa(mahasiswa_id)
+ON DELETE RESTRICT
+ON UPDATE CASCADE 
+);
+
+CREATE TABLE alat (
+alat_id CHAR(6) PRIMARY KEY,
+nama_alat VARCHAR(100) NOT NULL,
+kondisi VARCHAR(20) NOT NULL,
+status_alat VARCHAR(20) NOT NULL,
+tanggal_pengadaan DATE NOT NULL,
+kategori_alat_kategori_id CHAR(6) NOT NULL, 
+ruang_laboratorium_ruang_id CHAR(6) NOT NULL,
+pemasok_pemasok_id CHAR(6) NOT NULL,
+
+CONSTRAINT fk_alat_ruang_laboratorium FOREIGN KEY (ruang_laboratorium_ruang_id)
+REFERENCES ruang_laboratorium(ruang_id)
+ON DELETE RESTRICT
+ON UPDATE CASCADE,
+
+CONSTRAINT fk_alat_pemasok FOREIGN KEY (pemasok_pemasok_id)
+REFERENCES pemasok (pemasok_id)
+ON DELETE RESTRICT
+ON UPDATE CASCADE,
+
+CONSTRAINT fk_alat_kategori_alat FOREIGN KEY (kategori_alat_kategori_id)
+REFERENCES kategori_alat (kategori_id)
+ON DELETE RESTRICT
+ON UPDATE CASCADE
+);
+
+CREATE TABLE detail_peminjaman (
+peminjaman_peminjaman_id CHAR(6),
+alat_alat_id CHAR(6),  
+PRIMARY KEY (peminjaman_peminjaman_id, alat_alat_id),
+
+CONSTRAINT fk_detail_peminjaman_peminjaman FOREIGN KEY (peminjaman_peminjaman_id)
+REFERENCES peminjaman(peminjaman_id)
+ON DELETE RESTRICT
+ON UPDATE CASCADE,
+
+CONSTRAINT fk_detail_peminjaman_alat FOREIGN KEY (alat_alat_id)
+REFERENCES alat(alat_id)
+ON DELETE RESTRICT
+ON UPDATE CASCADE
+);
+ALTER TABLE  mahasiswa MODIFY email VARCHAR(100) UNIQUE;
+ALTER TABLE  petugas MODIFY email_petugas VARCHAR(100) UNIQUE;
+ALTER TABLE  kategori_alat MODIFY nama_kategori VARCHAR(50) UNIQUE;
+
+
+SELECT * FROM mahasiswa;
+SELECT * FROM alat;
+SELECT * FROM petugas;
+SELECT * FROM detail_peminjaman;
+SELECT * FROM pemasok;
+SELECT * FROM kategori_alat;
+SELECT * FROM ruang_laboratorium
+SELECT * FROM peminjaman; 
+SELECT * FROM perawatan; 
+
+-- NO 2
+ALTER TABLE alat ADD COLUMN lokasi_penyimpanan VARCHAR(50) DEFAULT 'Belum ditemukan';
+
+-- NO 3
+CREATE TABLE perawatan (
+perawatan_id CHAR(6) PRIMARY KEY,
+alat_id CHAR(6) NOT NULL,
+tanggal_perawatan DATE NOT NULL,
+deskripsi VARCHAR(255) NOT NULL,
+biaya INT NOT NULL,
+
+
+CONSTRAINT fk_perawatan_alat_id FOREIGN KEY (alat_id)
+REFERENCES alat(alat_id)
+ON DELETE RESTRICT
+ON UPDATE CASCADE
+
+); 
+
+SELECT * FROM perawatan;
+
+-- NO 4
+INSERT INTO  mahasiswa () VALUES 
+('MHS001', 'Alya Putri', 'alya@example.com', 1);
+
+INSERT INTO  mahasiswa () VALUES
+('MHS002', 'Farhan Maulana', 'farhan@example.com', 1),
+('MHS003', 'Intan Dewi', 'intan@example.com', 0);
+
+INSERT INTO petugas () VALUES 
+('PTG001', 'Budi Santoso', 'budi@example.com');
+
+INSERT INTO  kategori_alat () VALUES 
+('KTG001', 'Elektronik'),
+('KTG002', 'Mekanik'),
+('KTG004', 'Audio');
+
+INSERT INTO ruang_laboratorium () VALUES
+('RNG001', 'Ruang Instrumentasi', 'Gedung Laboratorium A', 1),
+('RNG002', 'Ruang Mekanik', 'Gedung Laboratorium A', 1);
+
+INSERT INTO pemasok  () VALUES 
+('PMS001', 'Pemasok Instrumentasi', '0215550101', 'pemasok1@example.com'),
+('PMS002', 'Pemasok Sarana Praktikum', '0215550102', 'NULL');
+
+-- no 4 lanjutan
+
+INSERT INTO alat (alat_id, nama_alat,kondisi,status_alat,tanggal_pengadaan,kategori_alat_kategori_id,ruang_laboratorium_ruang_id,pemasok_pemasok_id) VALUES 
+('ALT001', 'Multimeter Digital','Baik','Dipinjam','2025-08-01','KTG001','RNG001','PMS001'),
+('ALT002','Osiloskop','Baik','Tersedia','2025-08-02','KTG001','RNG001','PMS001'),
+('ALT004','Jangka Sorong','Baik','Tersedia','2025-09-10','KTG002','RNG002','PMS002'),
+('ALT005','Timbangan Digital','Rusak ringan','Perawatan','2024-11-30','KTG001','RNG001','PMS001');   
+
+
+INSERT INTO peminjaman (peminjaman_id,mahasiswa_mahasiswa_id,petugas_petugas_id,tanggal_pinjam,batas_kembali,tanggal_pengembalian) VALUES
+('PJM001','MHS001', 'PTG001', '2026-10-01', '2026-10-08', 'NULL'),
+('PJM002', 'MHS002', 'PTG001', '2026-09-20', '2026-09-27', '2026-09-26');
+
+DELETE FROM peminjaman WHERE peminjaman_id = 'PJM001';
+
+INSERT INTO peminjaman (peminjaman_id,mahasiswa_mahasiswa_id,petugas_petugas_id,tanggal_pinjam,batas_kembali,tanggal_pengembalian) VALUES
+('PJM001','MHS001', 'PTG001', '2026-10-01', '2026-10-08', NULL);
+
+INSERT INTO detail_peminjaman (peminjaman_peminjaman_id,alat_alat_id) VALUES 
+('PJM001', 'ALT001'),
+('PJM002', 'ALT004');
+
+-- no 5
+
+INSERT INTO alat (alat_id,nama_alat,kategori_alat_kategori_id,ruang_laboratorium_ruang_id,pemasok_pemasok_id,kondisi,status_alat,tanggal_pengadaan,lokasi_penyimpanan) VALUES 
+('ALT007', 'Sensor Suhu Digital','KTG001','RNG001','PMS001','Baik','Tersedia','2026-10-13','Lemari Elektronik B');
+
+-- no 6
+
+INSERT INTO peminjaman (peminjaman_id,tanggal_pinjam,batas_kembali,tanggal_pengembalian,mahasiswa_mahasiswa_id,petugas_petugas_id) VALUES 
+('PJM004','2026-10-13','2026-10-20',NULL,'MHS002','PTG001');
+
+
+INSERT INTO detail_peminjaman () VALUES 
+('PJM004','ALT002'),
+('PJM004','ALT007');
+
+UPDATE alat 
+SET status_alat = 'Dipinjam'
+WHERE alat_id IN ('ALT002','ALT007');
+
+
+-- no 7
+
+INSERT INTO perawatan (perawatan_id,alat_id,tanggal_perawatan,deskripsi,biaya) VALUES 
+('PRW001','ALT005','2026-10-13','Perbaikan sensor dan kalibrasi ulang', 75000);
+
+UPDATE alat
+ SET kondisi = 'Baik', status_alat = 'Tersedia'
+ WHERE alat_id = 'ALT005'; 
+
+-- no 8 
+
+UPDATE peminjaman 
+SET batas_kembali = DATE_ADD(batas_kembali, INTERVAL 7 DAY)
+WHERE peminjaman_id = 'PJM001';
+
+-- no 9
+
+DELETE FROM kategori_alat WHERE kategori_id = 'KTG004';
+
+-- no 10
+ALTER TABLE mahasiswa 
+MODIFY nama_mahasiswa VARCHAR(150) NOT NULL; 
+
+-- no 11
+ALTER TABLE alat 
+ADD COLUMN catatan_sementara VARCHAR(100) NULL;
+
+-- no 12
+
+ALTER TABLE alat 
+DROP COLUMN catatan_sementara;
